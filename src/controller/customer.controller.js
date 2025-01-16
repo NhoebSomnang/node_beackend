@@ -1,8 +1,11 @@
 const db = require("../config/db.config")
+const bcrypt = require("bcrypt")
+const customer = require("../route/customer.route")
 const create = (req,res) =>{
     let body = req.body
+    let password = bcrypt.hashSync(body.password,10)
     let sqlInsert = "INSERT INTO customer (firstname, lastname, gender, username, password) VALUES (?, ?, ?, ?, ?)"
-    let paramInsert = [body.firstname,body.lastname,body.gender,body.username,body.password]
+    let paramInsert = [body.firstname,body.lastname,body.gender,body.username,password]
     db.query(sqlInsert,paramInsert,(error,rows)=>{
         if(error){
             res.json({
@@ -188,6 +191,47 @@ const remove = (req, res) => {
         });
     });
 };
+const login = (req,res)=>{
+    let {username,password} = req.body
+    let message = {}
+    if(username == null || username == ""){
+        message.username = "Username is required"
+    }
+    if(password == null || password == ""){
+        message.password = "Password is required"
+    }
+    if(Object.keys(message).length > 0){
+        return res.json(message)
+    }
+    let sqlLogin = "SELECT * FROM customer WHERE username =?;"
+    let paramLogin = [username]
+    db.query(sqlLogin,paramLogin,(error,rows)=>{
+        if(error){
+            res.json({
+                error: error,
+                message: "Error retrieving data"
+            })
+        }else if(rows.length === 0){
+            res.json({
+                message: "username dose not exit"
+            })
+        }else{
+            let customer = rows[0]
+            let isValidPassword = bcrypt.compareSync(password,rows[0].password)
+            if(isValidPassword){
+                delete customer.password
+                res.json({
+                    profile: rows[0],
+                    message: "Logged in successfully"
+                })
+            }else{
+                res.json({
+                    message: "password incorrect "
+                })
+            }
+        }
+    })
+}
 
 module.exports={
     create,
@@ -195,4 +239,5 @@ module.exports={
     getall,
     update,
     remove,
+    login,
 }

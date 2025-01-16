@@ -14,3 +14,5 @@ Node+Mysql CRUD
 //module dependency install
 npm i express
     i Mysql
+    i bcrypt
+    let password = bcrypt.hashSync(body.password,10)

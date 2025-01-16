@@ -5,6 +5,7 @@ app.use(express.json())
 
 require("./src/route/customer.route")(app)
 require("./src/route/category.route")(app)
+require("./src/route/product.route")(app)
 
 
 

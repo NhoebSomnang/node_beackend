@@ -89,7 +89,7 @@ const update = (req, res) => {
 
         // Step 3: Proceed with the update
         let sqlUpdate = `
-            UPDATE customer 
+            UPDATE category 
             SET name = ?, 
                 description = ?, 
                 image = ?,  
